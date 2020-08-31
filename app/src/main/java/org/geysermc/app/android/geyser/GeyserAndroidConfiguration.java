@@ -48,7 +48,7 @@ public class GeyserAndroidConfiguration extends GeyserJacksonConfiguration {
     @JsonIgnore
     @SuppressLint("NewApi")
     @Override
-    public Path getFloodgateKeyFile() {
+    public Path getFloodgateKeyPath() {
         return Paths.get(floodgateKeyFile);
     }
 }

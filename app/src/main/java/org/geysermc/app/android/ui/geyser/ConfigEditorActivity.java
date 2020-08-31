@@ -43,10 +43,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.geysermc.app.android.R;
 import org.geysermc.app.android.utils.AndroidUtils;
 import org.geysermc.connector.common.serializer.AsteriskSerializer;
+import org.geysermc.connector.utils.FileUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class ConfigEditorActivity extends AppCompatActivity {
 
@@ -67,23 +69,28 @@ public class ConfigEditorActivity extends AppCompatActivity {
         // Fetch the stored config file
         configFile = AndroidUtils.getStoragePath(getApplicationContext()).resolve("config.yml").toFile();
 
+        if (!configFile.exists()) {
+            // Copy the default config from Geyser
+            try {
+                Files.copy(FileUtils.getResource("config.yml"), configFile.toPath());
+            } catch (IOException e) {
+                txtConfig.setText(configText);
+                return;
+            }
+        }
+
         if (showRaw) {
             setContentView(R.layout.activity_config_editor_raw);
 
             // Load the config
             txtConfig = findViewById(R.id.txtConfig);
 
-            if (configFile.exists()) {
-                // Enable horizontal scrolling
-                txtConfig.setHorizontallyScrolling(true);
+            // Enable horizontal scrolling
+            txtConfig.setHorizontallyScrolling(true);
 
-                // Get the config file text
-                configText = AndroidUtils.fileToString(configFile);
-                txtConfig.setText(configText);
-            } else {
-                txtConfig.setText(configText);
-                txtConfig.setEnabled(false);
-            }
+            // Get the config file text
+            configText = AndroidUtils.fileToString(configFile);
+            txtConfig.setText(configText);
 
             // Hide the loader
             AndroidUtils.HideLoader();
